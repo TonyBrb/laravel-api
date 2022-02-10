@@ -1950,6 +1950,21 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'Posts',
@@ -1958,20 +1973,26 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      apiUrl: 'http://127.0.0.1:8000/api/posts',
-      posts: null
+      apiUrl: 'http://127.0.0.1:8000/api/posts?page=',
+      posts: null,
+      pages: {}
     };
   },
   mounted: function mounted() {
-    this.getPost();
+    this.getPosts();
   },
   methods: {
-    getPost: function getPost() {
+    getPosts: function getPosts() {
       var _this = this;
 
-      axios.get(this.apiUrl).then(function (res) {
-        _this.posts = res.data;
+      var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+      axios.get(this.apiUrl + page).then(function (res) {
+        _this.posts = res.data.data;
         console.log(_this.posts);
+        _this.pages = {
+          current: res.data.current_page,
+          last: res.data.last_page
+        };
       });
     }
   }
@@ -3303,6 +3324,48 @@ var render = function () {
       _vm._l(_vm.posts, function (post) {
         return _c("PostItem", { key: post.id, attrs: { post: post } })
       }),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          attrs: { disabled: _vm.pages.current === 1 },
+          on: {
+            click: function ($event) {
+              return _vm.getPosts(_vm.pages.current - 1)
+            },
+          },
+        },
+        [_vm._v("prev")]
+      ),
+      _vm._v(" "),
+      _vm._l(_vm.pages.last, function (page) {
+        return _c(
+          "button",
+          {
+            key: page,
+            attrs: { disabled: _vm.pages.current === page },
+            on: {
+              click: function ($event) {
+                return _vm.getPosts(page)
+              },
+            },
+          },
+          [_vm._v(_vm._s(page))]
+        )
+      }),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          attrs: { disabled: _vm.pages.current === _vm.pages.last },
+          on: {
+            click: function ($event) {
+              return _vm.getPosts(_vm.pages.current + 1)
+            },
+          },
+        },
+        [_vm._v("next")]
+      ),
     ],
     2
   )

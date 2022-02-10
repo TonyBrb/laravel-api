@@ -6,6 +6,21 @@
       :key="post.id"
       :post = 'post'
     />
+
+    <button
+    @click="getPosts(pages.current - 1)"
+    :disabled="pages.current===1"
+    >prev</button>
+    <button
+          v-for="page in pages.last"
+         :key="page"
+         @click="getPosts(page)"
+         :disabled="pages.current === page">{{ page }}</button>
+
+    <button
+    @click="getPosts(pages.current + 1)"
+    :disabled="pages.current=== pages.last"
+    >next</button>
   </main>
 </template>
 
@@ -20,21 +35,26 @@ export default {
   },
   data(){
     return{
-      apiUrl: 'http://127.0.0.1:8000/api/posts',
-      posts: null
+      apiUrl: 'http://127.0.0.1:8000/api/posts?page=',
+      posts: null,
+      pages:{}
     }
   },
 
   mounted(){
-    this.getPost();
+    this.getPosts();
   },
 
   methods:{
-    getPost(){
-      axios.get(this.apiUrl)
+    getPosts(page = 1){
+      axios.get(this.apiUrl + page)
       .then(res=>{
-        this.posts = res.data
+        this.posts = res.data.data
         console.log(this.posts);
+        this.pages = {
+          current: res.data.current_page,
+          last: res.data.last_page
+        }
       })
     }
   }
